@@ -1,0 +1,81 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Base */
+    --background: 0 0% 98%;
+    --foreground: 240 6% 10%;
+
+    /* Superfícies */
+    --card: 0 0% 100%;
+    --card-foreground: 240 6% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 6% 10%;
+
+    /* Bordas e inputs */
+    --border: 240 6% 90%;
+    --input: 240 6% 88%;
+    --ring: 163 76% 24%;
+
+    /* Neutros */
+    --muted: 240 5% 96%;
+    --muted-foreground: 240 4% 46%;
+    --secondary: 240 5% 96%;
+    --secondary-foreground: 240 6% 14%;
+
+    /* Marca — verde-petróleo clínico, usado com moderação */
+    --primary: 163 76% 24%;
+    --primary-hover: 163 80% 18%;
+    --primary-foreground: 0 0% 100%;
+
+    --accent: 163 45% 95%;
+    --accent-foreground: 163 76% 20%;
+
+    /* Semânticas */
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 142 71% 35%;
+    --success-foreground: 0 0% 100%;
+    --warning: 32 95% 44%;
+    --warning-foreground: 0 0% 100%;
+
+    /* Sidebar */
+    --sidebar: 0 0% 100%;
+    --sidebar-foreground: 240 6% 30%;
+    --sidebar-border: 240 6% 91%;
+    --sidebar-active: 163 45% 94%;
+
+    --radius: 0.625rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "cv11", "ss01";
+  }
+
+  /* Números clínicos (CRM, datas, valores de exame) usam mono tabular —
+     é a assinatura visual do produto: precisão de instrumento, não decoração. */
+  .tabular-data {
+    @apply font-mono tabular-nums;
+  }
+
+  :focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+}
+
+@layer utilities {
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    @apply bg-border rounded-full;
+  }
+}
