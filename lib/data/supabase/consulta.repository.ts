@@ -48,7 +48,7 @@ async function anexarNomes(supabase: SupabaseClient, rows: ConsultaRow[]): Promi
     motivoConsulta: row.motivo_consulta ?? "",
     dataHora: row.data_hora,
     duracaoMinutos: row.duracao_minutos,
-    audioUrl: null,
+    audioUrl: row.audio_url,
     transcricao: row.transcricao,
     soap: row.soap,
     resumo: row.resumo,
@@ -168,6 +168,57 @@ export const consultaRepositorySupabase: ConsultaRepository = {
       .update({
         status: "concluida",
         duracao_minutos: dados.duracaoMinutos,
+        audio_url: dados.audioUrl,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    const [consulta] = await anexarNomes(supabase, [data]);
+    return consulta!;
+  },
+
+  async salvarTranscricao(id, transcricao) {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("consultas")
+      .update({ transcricao, updated_at: new Date().toISOString() })
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    const [consulta] = await anexarNomes(supabase, [data]);
+    return consulta!;
+  },
+
+  async salvarSoapEResumo(id, soap, resumo) {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("consultas")
+      .update({ soap, resumo, updated_at: new Date().toISOString() })
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    const [consulta] = await anexarNomes(supabase, [data]);
+    return consulta!;
+  },
+
+  async atualizar(id, dados) {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("consultas")
+      .update({
+        motivo_consulta: dados.motivoConsulta,
+        data_hora: dados.dataHora,
+        unidade_id: dados.unidadeId,
+        resumo: dados.resumo,
+        soap: dados.soap,
+        observacoes: dados.observacoes,
         updated_at: new Date().toISOString(),
       })
       .eq("id", id)

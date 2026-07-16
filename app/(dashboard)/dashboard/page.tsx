@@ -32,8 +32,8 @@ export default async function DashboardPage() {
         />
         <QuickAction
           href="/exames"
-          label="Adicionar exame"
-          description="Fotografe ou envie um exame em papel"
+          label="Ver exames"
+          description="Consulte os exames já registrados dos seus pacientes"
           icon={Camera}
         />
       </div>

@@ -149,9 +149,11 @@ export interface Database {
             objetivo: string;
             avaliacao: string;
             plano: string;
+            pontosParaConfirmar?: string[];
           } | null;
           resumo: string | null;
           observacoes: string | null;
+          audio_url: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -170,9 +172,11 @@ export interface Database {
             objetivo: string;
             avaliacao: string;
             plano: string;
+            pontosParaConfirmar?: string[];
           } | null;
           resumo?: string | null;
           observacoes?: string | null;
+          audio_url?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -191,9 +195,11 @@ export interface Database {
             objetivo: string;
             avaliacao: string;
             plano: string;
+            pontosParaConfirmar?: string[];
           } | null;
           resumo?: string | null;
           observacoes?: string | null;
+          audio_url?: string | null;
           created_at?: string;
           updated_at?: string;
         };

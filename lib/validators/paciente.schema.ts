@@ -17,7 +17,8 @@ export const pacienteSchema = z.object({
   cpf: z
     .string()
     .min(1, "Informe o CPF.")
-    .refine(validarCPF, "CPF inválido."),
+    .refine(validarCPF, "CPF inválido.")
+    .transform((valor) => valor.replace(/\D/g, "")),
   dataNascimento: z.string().min(1, "Informe a data de nascimento."),
   sexo: z.enum(["masculino", "feminino"], {
     errorMap: () => ({ message: "Selecione o sexo do paciente." }),

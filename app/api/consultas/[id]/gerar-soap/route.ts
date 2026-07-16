@@ -1,20 +1,20 @@
 import type { NextRequest } from "next/server";
 import { apiHandler } from "@/lib/api/handler";
 import { obterMedicoAutenticado } from "@/lib/api/auth";
-import { NotFoundError, NotImplementedError } from "@/lib/api/errors";
+import { NotFoundError, ValidationError } from "@/lib/api/errors";
 import { consultaRepository } from "@/lib/data";
+import { aiService } from "@/lib/ai";
 
 /**
  * POST /api/consultas/:id/gerar-soap
  *
- * Gera a evolução em formato SOAP a partir da transcrição já salva na
- * consulta, via aiService.gerarSOAP() (prompt: lib/ai/prompts/soap.md).
- *
- * STATUS: stub — responde 501 Not Implemented.
+ * Gera a evolução SOAP e o resumo da consulta a partir da transcrição
+ * já salva, via aiService.gerarSOAP() + aiService.gerarResumo()
+ * (prompts: lib/ai/prompts/soap.md e resumo-consulta.md).
  */
 export async function POST(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   return apiHandler(async () => {
-    await obterMedicoAutenticado();
+    const { medico } = await obterMedicoAutenticado();
 
     const { id } = await params;
     const consulta = await consultaRepository.buscarPorId(id);
@@ -22,10 +22,23 @@ export async function POST(_request: NextRequest, { params }: { params: Promise<
       throw new NotFoundError("Consulta não encontrada.");
     }
 
-    // TODO (módulo de IA): exigir que `consulta.transcricao` já exista
-    // (senão retornar ValidationError orientando a processar o áudio
-    // primeiro), depois chamar aiService.gerarSOAP(consulta.transcricao)
-    // e persistir o resultado em consulta.soap.
-    throw new NotImplementedError("Geração de SOAP ainda não implementada.");
+    if (consulta.medicoId !== medico.userId) {
+      throw new NotFoundError("Consulta não encontrada.");
+    }
+
+    if (!consulta.transcricao) {
+      throw new ValidationError(
+        "Esta consulta ainda não tem transcrição. Processe o áudio primeiro."
+      );
+    }
+
+    const [soap, resumo] = await Promise.all([
+      aiService.gerarSOAP(consulta.transcricao),
+      aiService.gerarResumo(consulta.transcricao),
+    ]);
+
+    const consultaAtualizada = await consultaRepository.salvarSoapEResumo(id, soap, resumo);
+
+    return { soap: consultaAtualizada.soap, resumo: consultaAtualizada.resumo };
   });
 }

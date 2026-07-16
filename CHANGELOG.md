@@ -4,6 +4,30 @@ Todas as mudanças relevantes do projeto, em ordem cronológica. O MVP está
 **congelado** ao final deste changelog — nenhuma funcionalidade nova até a
 próxima etapa de desenvolvimento.
 
+## [Correção crítica de segurança] — pós-congelamento
+
+### Corrigido
+- **CVE-2025-66478 (CVSS 10.0 — execução remota de código)**: o Next.js
+  15.1.0 usado originalmente tinha uma vulnerabilidade crítica na
+  implementação de React Server Components, explorável sem autenticação
+  em qualquer aplicação App Router. **Atualizado para Next.js 15.5.20**
+  (última versão da linha 15.x, com todas as correções de segurança
+  subsequentes também aplicadas — CVE-2025-55183, CVE-2025-55184,
+  CVE-2025-67779). `eslint-config-next` atualizado junto.
+- Middleware agora roda explicitamente em **runtime Node.js** (estável
+  desde o Next.js 15.5) em vez de Edge Runtime — eliminando um aviso de
+  build relacionado a uma API do Node.js usada internamente pelo
+  `@supabase/ssr` que não é suportada no Edge Runtime.
+- Revisão completa de todos os 272 imports `@/` do projeto — nenhum
+  quebrado.
+
+> Se você já tinha rodado este projeto com a versão anterior (Next.js
+> 15.1.0) em produção, recomenda-se rotacionar as chaves/segredos de
+> ambiente por precaução, conforme orientação oficial do Next.js para
+> este CVE.
+
+---
+
 ## [MVP Congelado] — Módulo 6 finalizado
 
 ### Adicionado

@@ -5,6 +5,7 @@ export interface Exame {
   id: string;
   pacienteId: string;
   pacienteNome: string;
+  consultaId: string | null;
   tipoExame: string;
   origem: OrigemExame;
   status: StatusExame;

@@ -73,6 +73,15 @@ export const unidadeRepositorySupabase: UnidadeRepository = {
   async excluir(id) {
     const supabase = await createClient();
     const { error } = await supabase.from("unidades").delete().eq("id", id);
-    if (error) throw error;
+    if (error) {
+      // 23503 = violação de chave estrangeira. Como `consultas.unidade_id`
+      // usa "on delete restrict", o Postgres recusa a exclusão de uma
+      // unidade que já tem consultas vinculadas. Traduzimos isso para uma
+      // mensagem amigável em vez de deixar o erro bruto do banco vazar.
+      if (error.code === "23503") {
+        throw new Error("UNIDADE_EM_USO");
+      }
+      throw error;
+    }
   },
 };

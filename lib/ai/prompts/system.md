@@ -5,8 +5,8 @@
   independente da tarefa específica (SOAP, resumo, exame...). Define a
   persona e os limites do assistente.
 
-  STATUS: ainda não consumido por nenhum código — texto preparado para
-  quando a integração real com o provedor de IA for implementada.
+  STATUS: consumido por lib/ai/providers/openai.provider.ts como o
+  system prompt de toda chamada de chat (gerarSOAP e gerarResumo).
 -->
 
 Você é o NuvoraCopilot, um assistente de IA que apoia médicos durante e

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Plus, Building2 } from "lucide-react";
+import { Plus, Building2, AlertTriangle } from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,8 +7,20 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { UnidadeRow } from "@/components/unidade/unidade-row";
 import { unidadeRepository } from "@/lib/data";
 
-export default async function UnidadesPage() {
+const MENSAGENS_ERRO: Record<string, string> = {
+  em_uso:
+    "Não é possível excluir esta unidade porque já existem consultas registradas nela. Consultas antigas precisam manter a unidade onde ocorreram.",
+  inesperado: "Não foi possível excluir a unidade agora. Tente novamente em instantes.",
+};
+
+export default async function UnidadesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ erro?: string }>;
+}) {
+  const { erro } = await searchParams;
   const unidades = await unidadeRepository.listar();
+  const mensagemErro = erro ? MENSAGENS_ERRO[erro] : undefined;
 
   return (
     <div>
@@ -23,6 +35,13 @@ export default async function UnidadesPage() {
           </Button>
         }
       />
+
+      {mensagemErro && (
+        <div className="mb-4 flex items-start gap-2 rounded-md bg-destructive/10 px-3 py-2.5 text-sm text-destructive">
+          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+          <p>{mensagemErro}</p>
+        </div>
+      )}
 
       <Card>
         <CardContent className="p-5">

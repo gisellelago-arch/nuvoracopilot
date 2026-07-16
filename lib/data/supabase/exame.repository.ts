@@ -17,6 +17,7 @@ async function anexarNomePaciente(supabase: SupabaseClient, rows: ExameRow[]): P
     id: row.id,
     pacienteId: row.paciente_id,
     pacienteNome: nomePaciente.get(row.paciente_id) ?? "Paciente",
+    consultaId: row.consulta_id,
     tipoExame: row.tipo_exame ?? "Exame",
     origem: row.origem as OrigemExame,
     status: row.status as StatusExame,
@@ -58,5 +59,17 @@ export const exameRepositorySupabase: ExameRepository = {
     if (!data) return null;
     const [exame] = await anexarNomePaciente(supabase, [data]);
     return exame ?? null;
+  },
+
+  async listarPorConsulta(consultaId) {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("exames")
+      .select("*")
+      .eq("consulta_id", consultaId)
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+    return anexarNomePaciente(supabase, data ?? []);
   },
 };

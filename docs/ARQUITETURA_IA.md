@@ -1,8 +1,9 @@
 # Arquitetura de IA — NuvoraCopilot
 
-Este documento descreve como a inteligência artificial é (e será) integrada
-ao sistema. **Nenhuma chamada real de IA está implementada ainda** — esta é
-a arquitetura preparada para recebê-las.
+Este documento descreve como a inteligência artificial é integrada ao
+sistema. **Atualização (Etapa 4):** transcrição, SOAP e resumo já fazem
+chamadas reais à OpenAI — ver "Estado atual" mais abaixo para o que
+ainda é stub.
 
 ## Modelo de negócio
 
@@ -39,7 +40,7 @@ lib/ai/
 │   ├── historico.md               # Tarefa: resumir histórico do paciente
 │   └── resumo-consulta.md         # Tarefa: gerar resumo da consulta
 └── providers/
-    └── openai.provider.ts         # Implementação OpenAI (hoje, stub)
+    └── openai.provider.ts         # Implementação OpenAI (real desde a Etapa 4)
 ```
 
 Manter os prompts como arquivos `.md` separados do código (em vez de
@@ -62,7 +63,7 @@ específico:
 
 Ver `lib/ai/types.ts` para as assinaturas completas.
 
-## Como o resto do sistema vai usar isso (futuro)
+## Como o resto do sistema usa isso
 
 ```ts
 import { aiService } from "@/lib/ai";
@@ -72,8 +73,10 @@ const soap = await aiService.gerarSOAP(texto);
 const resumo = await aiService.gerarResumo(texto);
 ```
 
-Nenhum desses três lugares precisa saber que por trás existe a OpenAI, o
-Whisper, o GPT-4o ou qualquer outra coisa.
+Isso já acontece de verdade em `app/api/consultas/[id]/processar-audio/route.ts`
+(transcrição) e `app/api/consultas/[id]/gerar-soap/route.ts` (SOAP + resumo,
+em paralelo). Nenhum desses lugares precisa saber que por trás existe a
+OpenAI, o Whisper, o GPT ou qualquer outra coisa.
 
 ## Como trocar de provedor no futuro
 
@@ -101,15 +104,21 @@ importado, direta ou indiretamente, por um Client Component (`"use client"`).
 Isso torna a regra "nenhuma página conhece a API de IA" impossível de violar
 por acidente, não apenas uma convenção de código.
 
-## Estado atual
+## Estado atual (Etapa 4)
 
-Todos os métodos de `openAIProvider` lançam um erro explícito
-(`ainda não implementado`) em vez de fazer qualquer chamada de rede. A
-estrutura está pronta; a implementação real (chamadas ao Whisper, GPT-4o e
-GPT-4o Vision) é um módulo futuro, deliberadamente fora do escopo do MVP
-atual.
+`transcreverAudio`, `gerarSOAP` e `gerarResumo` fazem chamadas reais à
+OpenAI (Whisper e GPT, via `lib/ai/providers/openai.provider.ts`),
+acionadas por `/api/consultas/:id/processar-audio` e
+`/api/consultas/:id/gerar-soap`.
 
-Pontos do código já marcados com `// TODO (módulo de IA)` indicando onde a
-integração vai entrar:
+`extrairDadosExame` continua lançando um erro explícito
+(`ainda não implementado`) — a extração de dados de exame é um módulo
+futuro, deliberadamente fora do escopo deste MVP (não há sequer upload
+de exame pela interface ainda; ver `docs/` e `TESTE-MVP.md` para o
+detalhe dessa limitação conhecida).
 
-- `lib/actions/consulta.actions.ts` → `finalizarConsultaAction()`
+Pontos do código ainda marcados com `// TODO (módulo de IA)`, para
+quando esse módulo futuro entrar:
+
+- `app/api/exames/[id]/processar/route.ts`
+- `app/api/pacientes/[id]/resumo/route.ts`

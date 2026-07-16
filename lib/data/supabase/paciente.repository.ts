@@ -35,14 +35,28 @@ async function obterUserIdAutenticado(supabase: Awaited<ReturnType<typeof create
   return user.id;
 }
 
+/**
+ * Escapa caracteres com significado especial na sintaxe de filtros do
+ * PostgREST (usada por `.or(...)` no cliente Supabase) — vírgula, ponto,
+ * dois-pontos, parênteses e a própria barra invertida. Sem isso, buscar
+ * por um nome com vírgula ou parênteses (ex: "Silva, Ana (mãe)") quebra
+ * a consulta e derruba a página com um erro não tratado.
+ */
+function escaparFiltroPostgrest(valor: string): string {
+  return valor.replace(/[\\,.():]/g, (caractere) => `\\${caractere}`);
+}
+
 export const pacienteRepositorySupabase: PacienteRepository = {
   async listar(filtro) {
     const supabase = await createClient();
     let query = supabase.from("pacientes").select("*").order("nome", { ascending: true });
 
     if (filtro) {
-      const termo = filtro.replace(/\D/g, "").length >= 3 ? filtro.replace(/\D/g, "") : filtro;
-      query = query.or(`nome.ilike.%${filtro}%,cpf.ilike.%${termo}%`);
+      const somenteDigitos = filtro.replace(/\D/g, "");
+      const termoCpf = somenteDigitos.length >= 3 ? somenteDigitos : filtro;
+      const nomeEscapado = escaparFiltroPostgrest(filtro);
+      const cpfEscapado = escaparFiltroPostgrest(termoCpf);
+      query = query.or(`nome.ilike.%${nomeEscapado}%,cpf.ilike.%${cpfEscapado}%`);
     }
 
     const { data, error } = await query;

@@ -27,13 +27,20 @@ export interface ConsultaRepository {
   iniciarAgora(dados: Pick<Consulta, "pacienteId" | "pacienteNome" | "unidadeId" | "unidadeNome" | "motivoConsulta">): Promise<Consulta>;
   iniciarAtendimento(id: string): Promise<Consulta>;
   atualizarObservacoes(id: string, observacoes: string): Promise<Consulta>;
-  finalizar(id: string, dados: { duracaoMinutos: number }): Promise<Consulta>;
+  finalizar(id: string, dados: { duracaoMinutos: number; audioUrl: string | null }): Promise<Consulta>;
+  salvarTranscricao(id: string, transcricao: string): Promise<Consulta>;
+  salvarSoapEResumo(id: string, soap: Consulta["soap"], resumo: string): Promise<Consulta>;
   listarProximas(limite?: number): Promise<Consulta[]>;
+  atualizar(
+    id: string,
+    dados: Pick<Consulta, "motivoConsulta" | "dataHora" | "unidadeId" | "resumo" | "soap" | "observacoes">
+  ): Promise<Consulta>;
 }
 
 export interface ExameRepository {
   listar(): Promise<Exame[]>;
   listarPorPaciente(pacienteId: string): Promise<Exame[]>;
+  listarPorConsulta(consultaId: string): Promise<Exame[]>;
   buscarPorId(id: string): Promise<Exame | null>;
 }
 

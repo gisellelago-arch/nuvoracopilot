@@ -17,6 +17,14 @@ export interface ResultadoSOAP {
   objetivo: string;
   avaliacao: string;
   plano: string;
+  /**
+   * Informações potencialmente relevantes, porém ambíguas na
+   * transcrição (ex: evento sem sintoma associado claro), que o
+   * médico pode querer confirmar com o paciente. Nunca contém
+   * conversa social — essa é eliminada totalmente, não relocada
+   * para cá. Lista vazia quando não há nada a confirmar.
+   */
+  pontosParaConfirmar: string[];
 }
 
 export interface ResultadoExtracaoExame {

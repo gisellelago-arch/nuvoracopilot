@@ -1,4 +1,3 @@
-import type { NextRequest } from "next/server";
 import { apiHandler } from "@/lib/api/handler";
 import { obterMedicoAutenticado } from "@/lib/api/auth";
 import { NotImplementedError } from "@/lib/api/errors";
@@ -19,7 +18,7 @@ import { NotImplementedError } from "@/lib/api/errors";
  * STATUS: stub — responde 501 Not Implemented em JSON simples (ainda
  * sem streaming, já que não há nada para transmitir).
  */
-export async function POST(_request: NextRequest) {
+export async function POST() {
   return apiHandler(async () => {
     await obterMedicoAutenticado();
 

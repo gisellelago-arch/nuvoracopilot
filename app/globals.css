@@ -48,6 +48,10 @@
     --sidebar-active: 163 45% 94%;
 
     --radius: 0.625rem;
+
+    /* Fontes (auto-hospedadas via @fontsource, sem dependência de rede em build) */
+    --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, monospace;
   }
 }
 

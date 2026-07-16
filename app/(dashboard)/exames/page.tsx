@@ -29,7 +29,7 @@ export default async function ExamesPage() {
             <EmptyState
               icon={FlaskConical}
               title="Nenhum exame cadastrado ainda"
-              description="Exames enviados a partir da ficha de um paciente aparecerão aqui."
+              description="O envio de exames pelo médico ainda não está disponível nesta versão. Exames aparecem aqui quando cadastrados diretamente no sistema."
             />
           ) : (
             <div className="divide-y divide-border">

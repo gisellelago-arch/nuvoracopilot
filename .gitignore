@@ -1,0 +1,40 @@
+# Dependências
+/node_modules
+/.pnp
+.pnp.js
+.yarn/install-state.gz
+
+# Testes
+/coverage
+
+# Next.js
+/.next/
+/out/
+
+# Produção
+/build
+
+# Variáveis de ambiente — NUNCA commitar. Contém a OPENAI_API_KEY e as
+# chaves do Supabase. Use .env.local.example como modelo.
+.env
+.env.local
+.env.*.local
+
+# Vercel
+.vercel
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editor / SO
+.DS_Store
+*.pem
+.vscode/*
+!.vscode/extensions.json
+.idea

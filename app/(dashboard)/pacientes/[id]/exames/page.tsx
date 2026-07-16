@@ -19,7 +19,11 @@ export default async function PacienteExamesPage({ params }: { params: Promise<{
     <Card>
       <CardContent className="p-5">
         {exames.length === 0 ? (
-          <EmptyState icon={FlaskConical} title="Nenhum exame registrado para este paciente" />
+          <EmptyState
+            icon={FlaskConical}
+            title="Nenhum exame registrado para este paciente"
+            description="O envio de exames pelo médico ainda não está disponível nesta versão. Exames aparecem aqui quando cadastrados diretamente no sistema."
+          />
         ) : (
           <div className="divide-y divide-border">
             {exames.map((exame) => (

@@ -18,6 +18,7 @@ export interface Consulta {
     objetivo: string;
     avaliacao: string;
     plano: string;
+    pontosParaConfirmar?: string[];
   } | null;
   resumo: string | null;
   observacoes: string | null;

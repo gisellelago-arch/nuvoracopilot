@@ -36,7 +36,31 @@ export async function entrar(
   });
 
   if (error) {
-    return { erro: "E-mail ou senha incorretos." };
+    console.error("[entrar] Erro real do Supabase Auth:", {
+      message: error.message,
+      status: error.status,
+      code: error.code,
+      name: error.name,
+      cause: (error as unknown as { cause?: unknown }).cause,
+    });
+
+    if (error.code === "email_not_confirmed" || error.message.toLowerCase().includes("email not confirmed")) {
+      return {
+        erro: "Seu e-mail ainda não foi confirmado. Verifique sua caixa de entrada (e a pasta de spam) e clique no link de confirmação antes de entrar.",
+      };
+    }
+
+    if (error.message.toLowerCase().includes("invalid api key")) {
+      return {
+        erro: "Não foi possível conectar ao sistema no momento. Tente novamente em instantes ou contate o suporte.",
+      };
+    }
+
+    if (error.message.toLowerCase().includes("invalid login credentials")) {
+      return { erro: "E-mail ou senha incorretos." };
+    }
+
+    return { erro: "Não foi possível entrar. Tente novamente em instantes." };
   }
 
   redirect("/dashboard");
@@ -64,7 +88,7 @@ export async function cadastrar(
   const supabase = await createClient();
   const { data } = resultado;
 
-  const { error } = await supabase.auth.signUp({
+  const { data: signUpData, error } = await supabase.auth.signUp({
     email: data.email,
     password: data.senha,
     options: {
@@ -81,10 +105,30 @@ export async function cadastrar(
   });
 
   if (error) {
-    if (error.message.includes("already registered")) {
+    console.error("[cadastrar] Erro real do Supabase Auth:", {
+      message: error.message,
+      status: error.status,
+      code: error.code,
+      name: error.name,
+      cause: (error as unknown as { cause?: unknown }).cause,
+    });
+
+    if (error.message.toLowerCase().includes("already registered") || error.code === "user_already_exists") {
       return { erro: "Este e-mail já está cadastrado." };
     }
-    return { erro: "Não foi possível concluir o cadastro. Tente novamente." };
+
+    if (error.message.toLowerCase().includes("invalid api key")) {
+      return {
+        erro: "Não foi possível conectar ao sistema no momento. Tente novamente em instantes ou contate o suporte.",
+      };
+    }
+
+    return { erro: "Não foi possível concluir o cadastro. Tente novamente em instantes." };
+  }
+
+  if (!signUpData.user) {
+    console.error("[cadastrar] signUp não retornou erro, mas também não retornou usuário:", signUpData);
+    return { erro: "Não foi possível concluir o cadastro (nenhum usuário retornado)." };
   }
 
   redirect("/dashboard");
@@ -118,6 +162,20 @@ export async function solicitarRecuperacaoSenha(
   // Por segurança, nunca revelamos se o e-mail existe ou não na base —
   // a resposta é sempre "sucesso" do ponto de vista do usuário.
   if (error) {
+    console.error("[solicitarRecuperacaoSenha] Erro real do Supabase Auth:", {
+      message: error.message,
+      status: error.status,
+      code: error.code,
+      name: error.name,
+      cause: (error as unknown as { cause?: unknown }).cause,
+    });
+
+    if (error.code === "over_email_send_rate_limit" || error.message.toLowerCase().includes("rate limit")) {
+      return {
+        erro: "Muitas tentativas de envio de e-mail em pouco tempo. Aguarde alguns minutos e tente novamente.",
+      };
+    }
+
     return { erro: "Não foi possível processar sua solicitação. Tente novamente em instantes." };
   }
 

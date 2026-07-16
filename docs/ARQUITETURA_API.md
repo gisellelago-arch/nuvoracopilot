@@ -1,8 +1,10 @@
 # Arquitetura de API — NuvoraCopilot
 
 Este documento descreve o padrão oficial de rotas de API REST do
-NuvoraCopilot. **Todas as rotas listadas aqui são stubs** — respondem
-`501 Not Implemented` até a integração real de IA ser construída.
+NuvoraCopilot. **Atualização (Etapa 4):** `processar-audio` e
+`gerar-soap` já fazem chamadas reais à OpenAI. `processar` (exame),
+`resumo` (paciente) e `ia/chat` continuam stubs (`501 Not Implemented`),
+fora do escopo deste MVP — ver a tabela de rotas mais abaixo.
 
 ## Quando usar API REST vs. Server Action
 
@@ -126,24 +128,24 @@ aparece no log do servidor.
 
 ## Verificação de posse do recurso
 
-RLS no banco já impede um médico de *ler* dados de outro médico. Mas as
-rotas de IA devem, além disso, **verificar explicitamente** que o
-recurso (consulta, exame, paciente) pertence ao médico autenticado antes
-de chamar um provedor de IA — porque uma chamada de IA custa dinheiro
-real, e um bug de lógica não deveria virar uma chamada paga sobre o
-recurso errado. Essa verificação está marcada como `TODO` em cada rota
-stub, para ser implementada junto da integração real (quando os
-repositórios estiverem de fato conectados ao Supabase e multi-tenant).
+RLS no banco já impede um médico de *ler* dados de outro médico. As duas
+rotas reais (`processar-audio`, `gerar-soap`) também **verificam
+explicitamente**, em código, que a consulta pertence ao médico
+autenticado antes de gastar uma chamada paga a um provedor de IA — devolvem
+`404` (não `403`) se não pertencer, para não revelar a um médico que o
+ID de uma consulta de outro médico existe. As rotas ainda-stub
+(`processar` exame, `resumo` paciente, `ia/chat`) devem seguir o mesmo
+padrão quando implementadas.
 
-## Rotas existentes (todas stub — 501 Not Implemented)
+## Rotas existentes
 
-| Rota | Método | Propósito futuro |
-|---|---|---|
-| `/api/consultas/:id/processar-audio` | POST | Transcrever o áudio da consulta |
-| `/api/consultas/:id/gerar-soap` | POST | Gerar a evolução SOAP a partir da transcrição |
-| `/api/exames/:id/processar` | POST | Extrair dados estruturados de um exame |
-| `/api/pacientes/:id/resumo` | POST | Resumo inteligente do histórico do paciente |
-| `/api/ia/chat` | POST | Chat clínico livre (streaming, futuro) |
+| Rota | Método | Status | Propósito |
+|---|---|---|---|
+| `/api/consultas/:id/processar-audio` | POST | **Real** | Baixa o áudio do Storage, transcreve via Whisper e salva a transcrição |
+| `/api/consultas/:id/gerar-soap` | POST | **Real** | Gera a evolução SOAP e o resumo a partir da transcrição, via GPT |
+| `/api/exames/:id/processar` | POST | Stub (`501`) | Futuro: extrair dados estruturados de um exame |
+| `/api/pacientes/:id/resumo` | POST | Stub (`501`) | Futuro: resumo inteligente do histórico do paciente |
+| `/api/ia/chat` | POST | Stub (`501`) | Futuro: chat clínico livre (streaming) |
 
 ## Caso especial: chat com streaming
 

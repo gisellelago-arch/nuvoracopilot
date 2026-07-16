@@ -47,6 +47,14 @@ export async function atualizarUnidade(
 }
 
 export async function excluirUnidade(id: string) {
-  await unidadeRepository.excluir(id);
+  try {
+    await unidadeRepository.excluir(id);
+  } catch (erro) {
+    if (erro instanceof Error && erro.message === "UNIDADE_EM_USO") {
+      redirect("/unidades?erro=em_uso");
+    }
+    console.error("[excluirUnidade] Erro inesperado:", erro);
+    redirect("/unidades?erro=inesperado");
+  }
   revalidatePath("/unidades");
 }
